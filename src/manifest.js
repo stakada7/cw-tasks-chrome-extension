@@ -1,9 +1,9 @@
 
 module.exports = {
-  name: 'Vue Extension',
-  version: '1.0.0',
-  description: 'Vue.js Chrome Extension Template (wcer)',
-  author: 'yura',
+  name: 'Chatwork mini',
+  version: '0.0.1',
+  description: 'Chatwork mini Chrome Extension',
+  author: 'stakada7',
   manifest_version: 2,
   icons: { '16': 'icons/16.png', '128': 'icons/128.png' },
   permissions: [
