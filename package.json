@@ -8,8 +8,9 @@
   "dependencies": {
     "axios": "^0.18.0",
     "element-ui": "^2.0.1",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.11",
     "moment": "^2.24.0",
+    "qs": "^6.6.0",
     "vue": "^2.5.2",
     "vue-meta": "^1.2.0",
     "vue-pouch": "^0.0.22",
