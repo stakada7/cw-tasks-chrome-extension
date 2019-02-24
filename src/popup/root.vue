@@ -1,37 +1,56 @@
 <template lang="pug">
-  el-tabs(v-model="activeTab" @tab-click="changeTab")
-    el-tab-pane(label="open" name="open")
-      section(v-if="errored")
-        p Error!!
-      section(v-else)
-        div(v-if="loading") Loading...
-        el-table(:data="ascLimitTimeOrder" stripe)
-          el-table-column(label="DATE" width="120")
-            template(slot-scope="scope")
-              i(class="el-icon-time")
-              span(style="margin-left: 10px") {{ scope.row.limit_time | moment }}
-          el-table-column(label="TASK" width="360")
-            template(slot-scope="scope")
-              span {{ scope.row.body }}
-          el-table-column(width="80")
-            template(slot-scope="scope")
-              el-button(size="mini" type="danger" @click="toggleTask('done', scope.row.task_id, scope.row.room.room_id)") Done
-    el-tab-pane(label="done" name="done")
-      section(v-if="errored")
-        p Error!!
-      section(v-else)
-        div(v-if="loading") Loading...
-        el-table(:data="descLimitTimeOrder" stripe)
-          el-table-column(width="80")
-            template(slot-scope="scope")
-              el-button(size="mini" type="success" @click="toggleTask('open', scope.row.task_id, scope.row.room.room_id)") Open
-          el-table-column(label="DATE" width="120")
-            template(slot-scope="scope")
-              i(class="el-icon-time")
-              span(style="margin-left: 10px") {{ scope.row.limit_time | moment }}
-          el-table-column(label="TASK" width="360")
-            template(slot-scope="scope")
-              span {{ scope.row.body }}
+  el-row
+    el-col(:span="24")
+      el-tabs(v-model="activeTab" @tab-click="changeTab")
+        el-tab-pane(label="create" name="create")
+          section(v-if="errored")
+            p Error!!
+          section(v-else)
+            el-row
+              el-col(:span="20")
+                el-input(placeholder="task" v-model="newTaskBody" clearable autofocus="true")
+              el-col(:span="4")
+                el-button(type="primary" @click="createTask()") Create
+            el-row
+              el-col(:span="24")
+                el-radio-group(v-model="newTaskDate")
+                  el-radio-button(label="Today")
+                  el-radio-button(label="Tomorrow")
+                  el-radio-button(label="Weekend")
+                  el-radio-button(label="Next Week")
+                  el-radio-button(label="Next Weekend")
+        el-tab-pane(label="open" name="open")
+          section(v-if="errored")
+            p Error!!
+          section(v-else)
+            div(v-if="loading") Loading...
+            el-table(:data="ascLimitTimeOrder" stripe)
+              el-table-column(label="DATE" width="120")
+                template(slot-scope="scope")
+                  i(class="el-icon-time")
+                  span(style="margin-left: 10px") {{ scope.row.limit_time | moment }}
+              el-table-column(label="TASK" width="360")
+                template(slot-scope="scope")
+                  span {{ scope.row.body }}
+              el-table-column(width="120")
+                template(slot-scope="scope")
+                  el-button(size="mini" type="danger" icon="el-icon-d-arrow-right" @click="toggleTask('done', scope.row.task_id, scope.row.room.room_id)") Done
+        el-tab-pane(label="done" name="done")
+          section(v-if="errored")
+            p Error!!
+          section(v-else)
+            div(v-if="loading") Loading...
+            el-table(:data="descLimitTimeOrder" stripe)
+              el-table-column(width="120")
+                template(slot-scope="scope")
+                  el-button(size="mini" type="success" icon="el-icon-d-arrow-left" @click="toggleTask('open', scope.row.task_id, scope.row.room.room_id)") Open
+              el-table-column(label="DATE" width="120")
+                template(slot-scope="scope")
+                  i(class="el-icon-time")
+                  span(style="margin-left: 10px") {{ scope.row.limit_time | moment }}
+              el-table-column(label="TASK" width="360")
+                template(slot-scope="scope")
+                  span {{ scope.row.body }}
 </template>
 <script>
   import Axios from 'Axios'
@@ -45,7 +64,9 @@
         tasks: null,
         loading: true,
         errored: false,
-        activeTab: 'open'
+        activeTab: 'open',
+        newTaskBody: '',
+        newTaskDate: 'Today'
       }
     },
     beforeCreate () {
@@ -92,6 +113,8 @@
         })
       },
       changeTab (tab = {'name': 'open'}) {
+        if (tab.name === 'create') { return }
+
         this.tasks = []
         this.loading = true
         Axios.get('https://api.chatwork.com/v2/my/tasks', {
@@ -102,7 +125,43 @@
           }
         }).then(response => {
           this.tasks = response.data
-          console.log(this.tasks)
+        }).catch(error => {
+          console.log(error)
+          this.errored = true
+        }).finally(() => {
+          this.loading = false
+        })
+      },
+      createTask () {
+        var limit = ''
+        switch (this.newTaskDate) {
+          case 'Today':
+            limit = moment().unix()
+            break
+          case 'Tomorrow':
+            limit = moment().add(1, 'd').unix()
+            break
+          case 'Weekend':
+            limit = moment().day('Friday').unix()
+            break
+          case 'Next Week':
+            limit = moment().day('Monday').unix()
+            break
+          case 'Next Weekend':
+            limit = moment().day('Friday').add(7, 'd').unix()
+            break
+        }
+        var params = {
+          body: this.newTaskBody,
+          limit: limit,
+          to_ids: ''
+        }
+        var myRoomId = 
+        Axios.post(`https://api.chatwork.com/v2/rooms/${myRoomId}/tasks`, qs.stringify(params), {
+          headers: {'X-ChatWorkToken': ''}
+        }).then(response => {
+          this.newTaskBody = ''
+          this.newTaskDate = 'Today'
         }).catch(error => {
           console.log(error)
           this.errored = true
@@ -122,20 +181,6 @@
     &:last-child {
       margin-bottom: 0;
     }
-  }
-  .el-header, .el-footer {
-    background-color: #B3C0D1;
-    color: #333;
-    text-align: center;
-    line-height: 60px;
-  }
-  .el-main {
-    background-color: #E9EEF3;
-    color: #333;
-    text-align: center;
-    line-height: 30px;
-  }
-  body > .el-container {
-    margin-bottom: 4px;
+    min-width: 600px;
   }
 </style>
