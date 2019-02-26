@@ -5,7 +5,7 @@ module.exports = {
   description: 'Chatwork mini Chrome Extension',
   author: 'stakada7',
   manifest_version: 2,
-  icons: { '16': 'icons/16.png', '128': 'icons/128.png' },
+  icons: { '19': 'icons/favicon.png', '128': 'icons/favicon.png' },
   permissions: [
     '<all_urls>',
     '*://*/*',
