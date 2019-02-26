@@ -10,7 +10,7 @@
               el-col(:span="20")
                 el-input(placeholder="task" v-model="newTaskBody" clearable autofocus="true")
               el-col(:span="4")
-                el-button(type="primary" @click="createTask()") Create
+                el-button(type="primary" :disabled="CreatingTask" @click="createTask()") Create
             el-row
               el-col(:span="24")
                 el-radio-group(v-model="newTaskDate")
@@ -34,7 +34,7 @@
                   span {{ scope.row.body }}
               el-table-column(width="120")
                 template(slot-scope="scope")
-                  el-button(size="mini" type="danger" icon="el-icon-d-arrow-right" @click="toggleTask('done', scope.row.task_id, scope.row.room.room_id)") Done
+                  el-button(size="mini" type="danger" :disabled="ChangingTask" icon="el-icon-d-arrow-right" @click="toggleTask('done', scope.row.task_id, scope.row.room.room_id)") Done
         el-tab-pane(label="done" name="done")
           section(v-if="errored")
             p Error!!
@@ -43,7 +43,7 @@
             el-table(:data="descLimitTimeOrder" stripe)
               el-table-column(width="120")
                 template(slot-scope="scope")
-                  el-button(size="mini" type="success" icon="el-icon-d-arrow-left" @click="toggleTask('open', scope.row.task_id, scope.row.room.room_id)") Open
+                  el-button(size="mini" type="success" :disabled="ChangingTask" icon="el-icon-d-arrow-left" @click="toggleTask('open', scope.row.task_id, scope.row.room.room_id)") Open
               el-table-column(label="DATE" width="120")
                 template(slot-scope="scope")
                   i(class="el-icon-time")
@@ -66,7 +66,9 @@
         errored: false,
         activeTab: 'open',
         newTaskBody: '',
-        newTaskDate: 'Today'
+        newTaskDate: 'Today',
+        creating: false,
+        changing: false
       }
     },
     beforeCreate () {
@@ -91,6 +93,16 @@
       },
       descLimitTimeOrder () {
         return _.orderBy(this.tasks, 'limit_time', 'desc')
+      },
+      CreatingTask: {
+        get () {
+          return this.creating
+        }
+      },
+      ChangingTask: {
+        get () {
+          return this.changing
+        }
       }
     },
     filters: {
@@ -100,6 +112,7 @@
     },
     methods: {
       toggleTask (body, taskId, roomId) {
+        this.changing = true
         Axios.put(`https://api.chatwork.com/v2/rooms/${roomId}/tasks/${taskId}/status`, qs.stringify({'body': body}), {
           headers: {'X-ChatWorkToken': ''}
         }).then(response => {
@@ -110,6 +123,7 @@
           console.log(error)
           this.errored = true
         }).finally(() => {
+          this.changing = false
         })
       },
       changeTab (tab = {'name': 'open'}) {
@@ -133,6 +147,7 @@
         })
       },
       createTask () {
+        this.creating = true
         var limit = ''
         switch (this.newTaskDate) {
           case 'Today':
@@ -167,6 +182,7 @@
           this.errored = true
         }).finally(() => {
           this.loading = false
+          this.creating = false
         })
       }
     }
