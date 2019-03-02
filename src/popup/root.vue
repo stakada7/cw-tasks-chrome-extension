@@ -14,6 +14,7 @@
             el-row
               el-col(:span="24")
                 el-radio-group(v-model="newTaskDate")
+                  el-radio-button(label="None")
                   el-radio-button(label="Today")
                   el-radio-button(label="Tomorrow")
                   el-radio-button(label="Weekend")
@@ -70,7 +71,7 @@
         errored: false,
         activeTab: 'open',
         newTaskBody: '',
-        newTaskDate: 'Today',
+        newTaskDate: 'None',
         creating: false,
         changing: false
       }
@@ -154,6 +155,9 @@
         this.creating = true
         var limit = ''
         switch (this.newTaskDate) {
+          case 'None':
+            limit = 0
+            break
           case 'Today':
             limit = moment().unix()
             break
