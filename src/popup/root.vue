@@ -112,6 +112,7 @@
     },
     filters: {
       moment: function (date) {
+        if (date === 0) { return '-' };
         return moment.unix(date).format('YYYY/MM/DD')
       }
     },
