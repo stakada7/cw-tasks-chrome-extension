@@ -94,7 +94,20 @@
     },
     computed: {
       ascLimitTimeOrder () {
-        return _.sortBy(this.tasks, 'limit_time')
+        if (this.tasks === null) { return }
+
+        var tasks = _.orderBy(this.tasks, 'limit_time')
+
+        var limitTimeIsAny = _.filter(tasks, task => {
+          return task.limit_time !== 0
+        })
+
+        var limitTimeIsZero = _.filter(tasks, task => {
+          return task.limit_time === 0
+        })
+
+        limitTimeIsAny.push(...limitTimeIsZero)
+        return limitTimeIsAny
       },
       descLimitTimeOrder () {
         return _.orderBy(this.tasks, 'limit_time', 'desc')
