@@ -58,6 +58,10 @@
   import qs from 'qs'
   import _ from 'lodash'
 
+  let cwToken = ''
+  let myId = ''
+  let myRoomId = ''
+
   export default {
     data: () => {
       return {
@@ -73,9 +77,9 @@
     },
     beforeCreate () {
       Axios.get('https://api.chatwork.com/v2/my/tasks', {
-        headers: {'X-ChatWorkToken': ''},
+        headers: {'X-ChatWorkToken': cwToken},
         params: {
-          assigned_by_account_id: '',
+          assigned_by_account_id: myId,
           status: 'open'
         }
       }).then(response => {
@@ -114,7 +118,7 @@
       toggleTask (body, taskId, roomId) {
         this.changing = true
         Axios.put(`https://api.chatwork.com/v2/rooms/${roomId}/tasks/${taskId}/status`, qs.stringify({'body': body}), {
-          headers: {'X-ChatWorkToken': ''}
+          headers: {'X-ChatWorkToken': cwToken}
         }).then(response => {
           this.tasks = this.tasks.filter(task => {
             return String(task.task_id) !== String(response.data.task_id)
@@ -132,9 +136,9 @@
         this.tasks = []
         this.loading = true
         Axios.get('https://api.chatwork.com/v2/my/tasks', {
-          headers: {'X-ChatWorkToken': ''},
+          headers: {'X-ChatWorkToken': cwToken},
           params: {
-            assigned_by_account_id: '',
+            assigned_by_account_id: myId,
             status: tab.name
           }
         }).then(response => {
@@ -171,9 +175,8 @@
           limit: limit,
           to_ids: ''
         }
-        var myRoomId = 
         Axios.post(`https://api.chatwork.com/v2/rooms/${myRoomId}/tasks`, qs.stringify(params), {
-          headers: {'X-ChatWorkToken': ''}
+          headers: {'X-ChatWorkToken': cwToken}
         }).then(response => {
           this.newTaskBody = ''
           this.newTaskDate = 'Today'
