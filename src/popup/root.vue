@@ -173,7 +173,7 @@
         var params = {
           body: this.newTaskBody,
           limit: limit,
-          to_ids: ''
+          to_ids: myId
         }
         Axios.post(`https://api.chatwork.com/v2/rooms/${myRoomId}/tasks`, qs.stringify(params), {
           headers: {'X-ChatWorkToken': cwToken}
