@@ -13,7 +13,7 @@
                 el-button(type="primary" :disabled="CreatingTask" @click="createTask()") Create
             el-row
               el-col(:span="24")
-                el-radio-group(v-model="newTaskDate")
+                el-radio-group(v-model="newTaskDate" size="mini")
                   el-radio-button(label="None")
                   el-radio-button(label="Today")
                   el-radio-button(label="Tomorrow")
