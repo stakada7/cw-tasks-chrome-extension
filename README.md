@@ -8,7 +8,7 @@ Chatwork Task Chrome Extension.
 3. set your chatwork token, your id and you room id at `src/popup/root.vue`
 4. `yarn dev`
 5. `chrome://extensions/`
-6. set build directory to extension.
+6. set `build` directory to extension.
 
 ## Dependency
 
